@@ -10,6 +10,20 @@ def enter_value(b, c):
     return a
 
 
+def get_accuracy():
+    print("Введите желаемую точность в виде десятичной дроби")
+    accuracy = False
+    while not accuracy:
+        try:
+            accuracy = float(input())
+            if accuracy <= 0 or accuracy >= 1:
+                accuracy = False
+                raise ValueError
+        except ValueError:
+            print("Повторите ввод")
+    return accuracy
+
+
 def equation_to_string(eq):
     s = ''
     for i in range(len(eq)):
@@ -67,17 +81,6 @@ if enter_value(1, 2) == 1:
         print("2. Метод секущих")
         print("3. Метод простых итераций")
         method = enter_value(1, 3)
-        print("Введите желаемую точность в виде десятичной дроби")
-        accuracy = False
-        while not accuracy:
-            try:
-                accuracy = float(input())
-                if accuracy <= 0 or accuracy >= 1:
-                    accuracy = False
-                    raise ValueError
-            except ValueError:
-                print("Повторите ввод")
-
         if method == 1:
             chord_method()
         elif method == 2:
