@@ -75,11 +75,11 @@ def equation_to_string(eq):
     return s
 
 
-def func(equation, x):
+def func(eq, x):
     s = 0
-    for i in range(len(equation)):
-        degree = len(equation) - 1 - i
-        s += equation[i] * x ** degree
+    for i in range(len(eq)):
+        degree = len(eq) - 1 - i
+        s += eq[i] * x ** degree
     return s
 
 
@@ -93,19 +93,22 @@ def print_table(table):
     print()
     for row in table[1:]:
         for c in row:
-            print('%.5f' % c, end='    ')
+            if c >= 0:
+                print(' %.5f' % c, end='    ')
+            else:
+                print('%.5f' % c, end='    ')
         print()
 
 
-def chord_method(equation):
+def chord_method(eq):
     print("Метод хорд")
     table = [["   №   ", "   a   ", "   b   ", "   x   ", "  F(a)  ", "  F(b)  ", "  F(x)  ", "|x_n+1 - x_n|"]]
     accuracy = get_accuracy()
-    a, b = get_interval(equation)
-    fa = func(equation, a)
-    fb = func(equation, b)
+    a, b = get_interval(eq)
+    fa = func(eq, a)
+    fb = func(eq, b)
     x = calculate_x_for_chord_method(a, b, fa, fb)
-    fx = func(equation, x)
+    fx = func(eq, x)
     deviation = min(abs(x-a), abs(x-b))
     table.append([0, a, b, x, fa, fb, fx, deviation])
     count = 0
@@ -118,15 +121,63 @@ def chord_method(equation):
             b = x
             fb = fx
         x = calculate_x_for_chord_method(a, b, fa, fb)
-        fx = func(equation, x)
+        fx = func(eq, x)
         deviation = min(abs(x - a), abs(x - b))
         table.append([count, a, b, x, fa, fb, fx, deviation])
     print_table(table)
     print("Корень:", table[-1][3])
 
 
-def secant_method():
+def get_initial_approximation(eq):
+    print("Введите начальное приближение корня")
+    flaga = False
+    a = 0
+    while not flaga:
+        try:
+            a = float(input())
+            flaga = True
+        except ValueError:
+            print("Повторите ввод")
+    b1 = a - 0.5
+    b2 = a + 0.5
+    while True:
+        if func(eq, a) * func(eq, b1) < 0:
+            return a, b1
+        elif func(eq, a) * func(eq, b2) < 0:
+            return a, b2
+        else:
+            b1 -= 0.5
+            b2 += 0.5
+
+
+def calculate_x_for_secant_method(a, b, fa, fb):
+    return b - fb*(b - a)/(fb - fa)
+
+
+def secant_method(eq):
     print("Метод секущих")
+    table = [["   №   ", "x_(k-1)", " x_k ", "x_(k+1)", "f(x_(k+1))", "|x_k+1 - x_k|"]]
+    accuracy = get_accuracy()
+    a, b = get_initial_approximation(eq)
+    fa = func(eq, a)
+    fb = func(eq, b)
+    x = calculate_x_for_secant_method(a, b, fa, fb)
+    fx = func(eq, x)
+    deviation = abs(x - b)
+    count = 0
+    table.append([count, a, b, x, fx, deviation])
+    while accuracy < abs(fx) or accuracy < deviation:
+        count += 1
+        a = b
+        b = x
+        fa = fb
+        fb = fx
+        x = calculate_x_for_chord_method(a, b, fa, fb)
+        fx = func(eq, x)
+        deviation = abs(x - b)
+        table.append([count, a, b, x, fx, deviation])
+    print_table(table)
+    print("Корень:", table[-1][3])
 
 
 def simple_iteration_method():
@@ -156,7 +207,7 @@ if enter_value(1, 2) == 1:
         if method == 1:
             chord_method(equation)
         elif method == 2:
-            secant_method()
+            secant_method(equation)
         else:
             simple_iteration_method()
     except ValueError:
