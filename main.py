@@ -102,7 +102,6 @@ def chord_method(equation):
     table = [["   №   ", "   a   ", "   b   ", "   x   ", "  F(a)  ", "  F(b)  ", "  F(x)  ", "|x_n+1 - x_n|"]]
     accuracy = get_accuracy()
     a, b = get_interval(equation)
-    print(111)
     fa = func(equation, a)
     fb = func(equation, b)
     x = calculate_x_for_chord_method(a, b, fa, fb)
