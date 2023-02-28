@@ -10,6 +10,31 @@ def enter_value(b, c):
     return a
 
 
+def equation_to_string(eq):
+    s = ''
+    for i in range(len(eq)):
+        degree = len(eq) - i - 1
+        if eq[i] == 0:
+            continue
+        if abs(eq[i]) != 1:
+            s += str(abs(eq[i]))
+        if degree > 1:
+            s += "x^" + str(degree)
+            if eq[i+1] > 0:
+                s += ' + '
+            else:
+                s += ' - '
+        elif degree == 1:
+            s += "x"
+            if eq[i+1] >= 0:
+                s += ' + '
+            else:
+                s += ' - '
+        else:
+            continue
+    return s
+
+
 def chord_method():
     print("Метод хорд")
 
@@ -29,19 +54,37 @@ if enter_value(1, 2) == 1:
     f = open("equations.txt")
     count = int(f.readline())
     print("Выбирите нелинейное уравнение:")
-    for x in range(1, count + 1):
-        print(x, ". ", f.readline(), sep="")
-    equation = enter_value(1, count)
-    print("ВЫберите метод:")
-    print("1. Метод хорд")
-    print("2. Метод секущих")
-    print("3. Метод простых итераций")
-    method = enter_value(1, 3)
-    if method == 1:
-        chord_method()
-    elif method == 2:
-        secant_method()
-    else:
-        simple_iteration_method()
+    equations = []
+    try:
+        for x in range(1, count + 1):
+            eq = [float(y) for y in f.readline().split()]
+            s = str(x) + '. ' + equation_to_string(eq)
+            equations.append(eq)
+            print(s)
+        equation = equations[enter_value(1, count)-1]
+        print("ВЫберите метод:")
+        print("1. Метод хорд")
+        print("2. Метод секущих")
+        print("3. Метод простых итераций")
+        method = enter_value(1, 3)
+        print("Введите желаемую точность в виде десятичной дроби")
+        accuracy = False
+        while not accuracy:
+            try:
+                accuracy = float(input())
+                if accuracy <= 0 or accuracy >= 1:
+                    accuracy = False
+                    raise ValueError
+            except ValueError:
+                print("Повторите ввод")
+
+        if method == 1:
+            chord_method()
+        elif method == 2:
+            secant_method()
+        else:
+            simple_iteration_method()
+    except ValueError:
+        print("Ошибка в введенном уравнении")
 else:
     print("Выберите систему нелинейных уравнений:")
