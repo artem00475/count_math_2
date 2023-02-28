@@ -9,6 +9,7 @@ def enter_value(b, c):
             print("Повторите ввод")
     return a
 
+
 def chord_method():
     print("Метод хорд")
 
@@ -19,6 +20,7 @@ def secant_method():
 
 def simple_iteration_method():
     print("Метод простых итераций")
+
 
 print("Выберите, что хотите решить:")
 print("1. Нелинейное уравнение")
