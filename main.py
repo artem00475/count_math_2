@@ -24,6 +24,32 @@ def get_accuracy():
     return accuracy
 
 
+def get_interval(e):
+    while True:
+        print("Введите левую границу интервала")
+        flaga = False
+        a = 0
+        while not flaga:
+            try:
+                a = float(input())
+                flaga = True
+            except ValueError:
+                print("Повторите ввод")
+        print("Введите правую границу интервала")
+        flagb = False
+        b = 0
+        while not flagb:
+            try:
+                b = float(input())
+                flagb = True
+            except ValueError:
+                print("Повторите ввод")
+        if func(e, a)*func(e, b) > 0:
+            print("На данном интервале нет корней. Повторите ввод")
+        else:
+            return a, b
+
+
 def equation_to_string(eq):
     s = ''
     for i in range(len(eq)):
@@ -49,8 +75,55 @@ def equation_to_string(eq):
     return s
 
 
-def chord_method():
+def func(equation, x):
+    s = 0
+    for i in range(len(equation)):
+        degree = len(equation) - 1 - i
+        s += equation[i] * x ** degree
+    return s
+
+
+def calculate_x_for_chord_method(a, b, fa, fb):
+    return (a*fb - b*fa)/(fb-fa)
+
+
+def print_table(table):
+    for c in table[0]:
+        print(c, end='    ')
+    print()
+    for row in table[1:]:
+        for c in row:
+            print('%.5f' % c, end='    ')
+        print()
+
+
+def chord_method(equation):
     print("Метод хорд")
+    table = [["   №   ", "   a   ", "   b   ", "   x   ", "  F(a)  ", "  F(b)  ", "  F(x)  ", "|x_n+1 - x_n|"]]
+    accuracy = get_accuracy()
+    a, b = get_interval(equation)
+    print(111)
+    fa = func(equation, a)
+    fb = func(equation, b)
+    x = calculate_x_for_chord_method(a, b, fa, fb)
+    fx = func(equation, x)
+    deviation = min(abs(x-a), abs(x-b))
+    table.append([0, a, b, x, fa, fb, fx, deviation])
+    count = 0
+    while accuracy < abs(fx) or accuracy < deviation:
+        count += 1
+        if fx * fa > 0:
+            a = x
+            fa = fx
+        else:
+            b = x
+            fb = fx
+        x = calculate_x_for_chord_method(a, b, fa, fb)
+        fx = func(equation, x)
+        deviation = min(abs(x - a), abs(x - b))
+        table.append([count, a, b, x, fa, fb, fx, deviation])
+    print_table(table)
+    print("Корень:", table[-1][3])
 
 
 def secant_method():
@@ -71,9 +144,9 @@ if enter_value(1, 2) == 1:
     equations = []
     try:
         for x in range(1, count + 1):
-            eq = [float(y) for y in f.readline().split()]
-            s = str(x) + '. ' + equation_to_string(eq)
-            equations.append(eq)
+            e = [float(y) for y in f.readline().split()]
+            s = str(x) + '. ' + equation_to_string(e)
+            equations.append(e)
             print(s)
         equation = equations[enter_value(1, count)-1]
         print("ВЫберите метод:")
@@ -82,7 +155,7 @@ if enter_value(1, 2) == 1:
         print("3. Метод простых итераций")
         method = enter_value(1, 3)
         if method == 1:
-            chord_method()
+            chord_method(equation)
         elif method == 2:
             secant_method()
         else:
