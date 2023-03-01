@@ -180,8 +180,43 @@ def secant_method(eq):
     print("Корень:", table[-1][3])
 
 
-def simple_iteration_method():
+def derivative(eq):
+    d = []
+    for i in range(len(eq) - 1):
+        degree = len(eq) - 1 - i
+        d.append(eq[i] * degree)
+    return d
+
+
+def simple_iteration_method(eq):
     print("Метод простых итераций")
+    table = [["   №   ", " x_k ", "x_(k+1)", "f(x_(k+1))", "|x_k+1 - x_k|"]]
+    accuracy = get_accuracy()
+    a, b = get_interval(eq)
+    der = derivative(eq)
+    alpha = -1/max(abs(func(der, a)), abs(func(der, b)))
+    phi = []
+    for i in range(len(eq)):
+        phi.append(eq[i] * alpha)
+    phi[-2] += 1
+    if abs(func(der, a)) >= abs(func(der, b)):
+        x = a
+    else:
+        x = b
+    phix = func(phi, x)
+    deviation = abs(x - phix)
+    fphi = func(eq, phix)
+    count = 0
+    table.append([count, x, phix, fphi, deviation])
+    while accuracy < abs(fphi) or accuracy < deviation:
+        count += 1
+        x = phix
+        phix = func(phi, x)
+        fphi = func(eq, phix)
+        deviation = abs(x - phix)
+        table.append([count, x, phix, fphi, deviation])
+    print_table(table)
+    print("Корень:", table[-1][2])
 
 
 print("Выберите, что хотите решить:")
@@ -209,7 +244,7 @@ if enter_value(1, 2) == 1:
         elif method == 2:
             secant_method(equation)
         else:
-            simple_iteration_method()
+            simple_iteration_method(equation)
     except ValueError:
         print("Ошибка в введенном уравнении")
 else:
