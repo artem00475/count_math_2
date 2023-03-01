@@ -1,3 +1,17 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+
+def show_graph(a, b, num):
+    x = np.arange(a, b + 0.01, 0.01)
+    if num == 1:
+        plt.plot(x, x**3-0.77*x**2-1.251*x+0.43)
+    elif num == 2:
+        plt.plot(x, x**2 - x + 4)
+    plt.grid(True)
+    plt.show()
+
+
 def enter_value(b, c):
     a = 0
     while a < b or a > c:
@@ -142,11 +156,12 @@ def print_result(table, x, count, fx):
             print("Повторите ввод")
 
 
-def chord_method(eq):
+def chord_method(eq, num):
     print("Метод хорд")
     table = [["   №   ", "   a   ", "   b   ", "   x   ", "  F(a)  ", "  F(b)  ", "  F(x)  ", "|x_n+1 - x_n|"]]
     accuracy = get_accuracy()
     a, b = get_interval(eq)
+    a0, b0 = a, b
     fa = func(eq, a)
     fb = func(eq, b)
     x = calculate_x_for_chord_method(a, b, fa, fb)
@@ -167,6 +182,7 @@ def chord_method(eq):
         deviation = min(abs(x - a), abs(x - b))
         table.append([count, a, b, x, fa, fb, fx, deviation])
     print_result(table, table[-1][3], count, fx)
+    show_graph(a0 - 1, b0 + 1, num)
 
 
 def get_initial_approximation(eq):
@@ -195,11 +211,12 @@ def calculate_x_for_secant_method(a, b, fa, fb):
     return b - fb*(b - a)/(fb - fa)
 
 
-def secant_method(eq):
+def secant_method(eq, num):
     print("Метод секущих")
     table = [["   №   ", "x_(k-1)", " x_k ", "x_(k+1)", "f(x_(k+1))", "|x_k+1 - x_k|"]]
     accuracy = get_accuracy()
     a, b = get_initial_approximation(eq)
+    a0, b0 = a, b
     fa = func(eq, a)
     fb = func(eq, b)
     x = calculate_x_for_secant_method(a, b, fa, fb)
@@ -218,6 +235,7 @@ def secant_method(eq):
         deviation = abs(x - b)
         table.append([count, a, b, x, fx, deviation])
     print_result(table, table[-1][3], count, fx)
+    show_graph(a0 - 1, b0 + 1, num)
 
 
 def derivative(eq):
@@ -228,11 +246,12 @@ def derivative(eq):
     return d
 
 
-def simple_iteration_method(eq):
+def simple_iteration_method(eq, num):
     print("Метод простых итераций")
     table = [["   №   ", " x_k ", "x_(k+1)", "f(x_(k+1))", "|x_k+1 - x_k|"]]
     accuracy = get_accuracy()
     a, b = get_interval(eq)
+    a0, b0 = a, b
     der = derivative(eq)
     alpha = -1/max(abs(func(der, a)), abs(func(der, b)))
     phi = []
@@ -256,6 +275,7 @@ def simple_iteration_method(eq):
         deviation = abs(x - phix)
         table.append([count, x, phix, fphi, deviation])
     print_result(table, table[-1][2], count, fphi)
+    show_graph(a0 - 1, b0 + 1, num)
 
 
 print("Выберите, что хотите решить:")
@@ -272,18 +292,19 @@ if enter_value(1, 2) == 1:
             s = str(x) + '. ' + equation_to_string(e)
             equations.append(e)
             print(s)
-        equation = equations[enter_value(1, count)-1]
+        number = enter_value(1, count)
+        equation = equations[number-1]
         print("ВЫберите метод:")
         print("1. Метод хорд")
         print("2. Метод секущих")
         print("3. Метод простых итераций")
         method = enter_value(1, 3)
         if method == 1:
-            chord_method(equation)
+            chord_method(equation, number)
         elif method == 2:
-            secant_method(equation)
+            secant_method(equation, number)
         else:
-            simple_iteration_method(equation)
+            simple_iteration_method(equation, number)
     except ValueError:
         print("Ошибка в введенном уравнении")
 else:
