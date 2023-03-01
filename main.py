@@ -100,6 +100,48 @@ def print_table(table):
         print()
 
 
+def print_table_to_file(table):
+    for c in table[0]:
+        f.write(c + '    ')
+    f.write('\n')
+    for row in table[1:]:
+        for c in row:
+            if c >= 0:
+                f.write(' %.5f    ' % c)
+            else:
+                f.write('%.5f    ' % c)
+        f.write('\n')
+
+def print_to_output(table, x, count, fx):
+    print_table(table)
+    print("Корень: %.5f" % x)
+    print("Число итераций:", count + 1)
+    print("Значение функции: %.5f" % fx)
+
+
+def print_to_file(table, x, count, fx):
+    name = input("Введите имя файла: ")
+    f = open(name, 'w')
+    print_table_to_file(table)
+    f.write("Корень: %.5f\n" % x)
+    f.write("Число итераций:" + str(count + 1) + '\n')
+    f.write("Значение функции: %.5f\n" % fx)
+    f.close()
+
+
+def print_result(table, x, count, fx):
+    while True:
+        t = input("Для вывода в консоль введите c, для сохранения в файл введите f: ")
+        if t.split()[0] == "f":
+            print_to_file(table, x, count, fx)
+            break
+        elif t.split()[0] == "c":
+            print_to_output(table, x, count, fx)
+            break
+        else:
+            print("Повторите ввод")
+
+
 def chord_method(eq):
     print("Метод хорд")
     table = [["   №   ", "   a   ", "   b   ", "   x   ", "  F(a)  ", "  F(b)  ", "  F(x)  ", "|x_n+1 - x_n|"]]
@@ -124,10 +166,7 @@ def chord_method(eq):
         fx = func(eq, x)
         deviation = min(abs(x - a), abs(x - b))
         table.append([count, a, b, x, fa, fb, fx, deviation])
-    print_table(table)
-    print("Корень: %.5f" % table[-1][3])
-    print("Число итераций:", count+1)
-    print("Значение функции: %.5f" % fx)
+    print_result(table, table[-1][3], count, fx)
 
 
 def get_initial_approximation(eq):
@@ -178,10 +217,7 @@ def secant_method(eq):
         fx = func(eq, x)
         deviation = abs(x - b)
         table.append([count, a, b, x, fx, deviation])
-    print_table(table)
-    print("Корень: %.5f" % table[-1][3])
-    print("Число итераций:", count + 1)
-    print("Значение функции: %.5f" % fx)
+    print_result(table, table[-1][3], count, fx)
 
 
 def derivative(eq):
@@ -219,10 +255,7 @@ def simple_iteration_method(eq):
         fphi = func(eq, phix)
         deviation = abs(x - phix)
         table.append([count, x, phix, fphi, deviation])
-    print_table(table)
-    print("Корень: %.5f" % table[-1][2])
-    print("Число итераций:", count + 1)
-    print("Значение функции: %.5f" % fphi)
+    print_result(table, table[-1][2], count, fphi)
 
 
 print("Выберите, что хотите решить:")
