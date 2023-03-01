@@ -125,7 +125,9 @@ def chord_method(eq):
         deviation = min(abs(x - a), abs(x - b))
         table.append([count, a, b, x, fa, fb, fx, deviation])
     print_table(table)
-    print("Корень:", table[-1][3])
+    print("Корень: %.5f" % table[-1][3])
+    print("Число итераций:", count+1)
+    print("Значение функции: %.5f" % fx)
 
 
 def get_initial_approximation(eq):
@@ -177,7 +179,9 @@ def secant_method(eq):
         deviation = abs(x - b)
         table.append([count, a, b, x, fx, deviation])
     print_table(table)
-    print("Корень:", table[-1][3])
+    print("Корень: %.5f" % table[-1][3])
+    print("Число итераций:", count + 1)
+    print("Значение функции: %.5f" % fx)
 
 
 def derivative(eq):
@@ -216,7 +220,9 @@ def simple_iteration_method(eq):
         deviation = abs(x - phix)
         table.append([count, x, phix, fphi, deviation])
     print_table(table)
-    print("Корень:", table[-1][2])
+    print("Корень: %.5f" % table[-1][2])
+    print("Число итераций:", count + 1)
+    print("Значение функции: %.5f" % fphi)
 
 
 print("Выберите, что хотите решить:")
