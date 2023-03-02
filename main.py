@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from sympy import *
 
 
 def show_graph(a, b, num):
@@ -9,9 +10,22 @@ def show_graph(a, b, num):
     elif num == 2:
         plt.plot(x, x ** 2 - x + 4)
     elif num == 3:
-        plt.plot(x, 20*np.cos(x)+x**2)
+        plt.plot(x, 20 * np.cos(x) + x ** 2)
     plt.grid(True)
     plt.show()
+
+
+def show_system_graph(num):
+    var('x y')
+    if num == 1:
+        p1 = plot_implicit(Eq(0.1*x**2 + x + 0.2*y**2, 0.3), show=False, line_color='r')
+        p2 = plot_implicit(Eq(0.2*x**2 + y + 0.1*x*y, 0.7), show=False)
+    else:
+        p1 = plot_implicit(Eq(0.2 * x ** 2 + x + 0.3 * y ** 2, 0.5), show=False, line_color='r')
+        p2 = plot_implicit(Eq(0.4 * x ** 2 + y + 0.2 * x * y, 0.5), show=False)
+    p2.extend(p1)
+    p2.xscale = ''
+    p2.show()
 
 
 def enter_value(b, c):
@@ -274,7 +288,7 @@ def derivative(eq):
     i = 0
     while i < len(eq):
         if str(eq[i]) == '^':
-            degree = eq[i-1]
+            degree = eq[i - 1]
             d.append(degree)
             d += container[:-1]
             d.append(degree - 1)
@@ -291,11 +305,11 @@ def derivative(eq):
             container = []
             d.append('sin')
             d.append('*')
-            if i < len(eq) - 2 and str(eq[i+1]) == '*':
+            if i < len(eq) - 2 and str(eq[i + 1]) == '*':
                 d.append('*')
                 i += 1
-        elif str(eq[i]) == 'x' and i < len(eq) -3 and str(eq[i+2]) != "^" and str(eq[i+1]) != "sin" \
-                and str(eq[i+1]) != "cos":
+        elif str(eq[i]) == 'x' and i < len(eq) - 3 and str(eq[i + 2]) != "^" and str(eq[i + 1]) != "sin" \
+                and str(eq[i + 1]) != "cos":
             d += container
             container = []
             d.append('x')
@@ -373,68 +387,191 @@ def get_system_start():
 
 
 def system_func(eq, x1, x2):
-    res = eq[-1]
-    for i in range(len(eq) - 2, -1, -1):
-        degree = (len(eq) - i + 1) // 3
-        index = (len(eq) - i + 1) % 3
-        if index == 0:
-            res += eq[i]*(x1**degree)
-        elif index == 1:
-            res += eq[i]*(x2**degree)
+    s = []
+    symb = ['-', '+', '*', '^']
+    for i in eq:
+        if i not in symb:
+            if i == 'x_1':
+                s.append(x1)
+            elif i == 'x_2':
+                s.append(x2)
+            else:
+                s.append(i)
         else:
-            res += eq[i]*(x1**degree)*(x2**degree)
-    res = round(res, 5)
-    if abs(res) == 0:
-        res = 0
-    return res
+            if i == '-':
+                a = s.pop()
+                b = s.pop()
+                s.append(b - a)
+            elif i == '+':
+                a = s.pop()
+                b = s.pop()
+                s.append(b + a)
+            elif i == '*':
+                a = s.pop()
+                b = s.pop()
+                s.append(b * a)
+            elif i == '^':
+                a = s.pop()
+                b = s.pop()
+                s.append(b ** a)
+    return s[0]
 
 
-def derivative_equation(eq, a):
-    res = [0, 0]
-    for i in range(len(eq) - 2, -1, -1):
-        degree = (len(eq) - i + 1) // 3
-        index = (len(eq) - i + 1) % 3
-        if index == a:
-            res[1-a] += eq[i]*degree
-        elif index == 2:
-            res[a] += eq[i]*degree
-    return res
+def derivative_equation_by_x2(eq):
+    d = []
+    c = 0
+    i = 0
+    while i < len(eq) - 4:
+        if str(eq[i]) == 'x_2':
+            if str(eq[i-2]) == 'x_1':
+                if str(eq[i+1]) == '*':
+                    d.append(eq[i-3])
+                    d.append(eq[i-2])
+                    d.append('*')
+                    if c > 0:
+                        d.append(eq[i + 2])
+            elif str(eq[i-1]) == 'x_1':
+                d.append(eq[i - 1])
+                if c > 0:
+                    d.append(eq[i + 2])
+            elif i < len(eq) - 2 and str(eq[i+2]) == "^":
+                if str(eq[i + 3]) == '*':
+                    d.append(eq[i - 1])
+                    degree = eq[i + 1]
+                    d.append(degree)
+                    d.append(eq[i])
+                    d.append(degree - 1)
+                    d.append('^')
+                    d.append('*')
+                    d.append('*')
+                    if c > 0:
+                        d.append(eq[i+4])
+                else:
+                    degree = eq[i + 1]
+                    d.append(degree)
+                    d.append(eq[i])
+                    d.append(degree - 1)
+                    d.append('^')
+                    d.append('*')
+                    if c > 0:
+                        d.append(eq[i + 3])
+            else:
+                if str(eq[i+1]) == "*":
+                    d.append(eq[i-1])
+                    if c > 0:
+                        d.append(eq[i + 2])
+                else:
+                    d.append(1.0)
+                    if c > 0:
+                        d.append(eq[i + 1])
+            c += 1
+        i += 1
+    d.append(eq[-4])
+    d.append(eq[-3])
+    if eq[-2] == 'x_2':
+        d.append(1.0)
+        d.append(eq[-1])
+    return d
+
+
+def derivative_equation_by_x1(eq):
+    d = []
+    c = 0
+    i = 0
+    while i < len(eq) - 4:
+        if str(eq[i]) == 'x_1':
+            if str(eq[i+2]) == 'x_2':
+                if str(eq[i+3]) == '*':
+                    d.append(eq[i-1])
+                    d.append(eq[i+2])
+                    d.append('*')
+                    if c > 0:
+                        d.append(eq[i + 4])
+            elif str(eq[i+1]) == 'x_2':
+                d.append(eq[i + 1])
+                if c > 0:
+                    d.append(eq[i + 3])
+            elif i < len(eq) - 2 and str(eq[i+2]) == "^":
+                if str(eq[i + 3]) == '*':
+                    d.append(eq[i - 1])
+                    degree = eq[i + 1]
+                    d.append(degree)
+                    d.append(eq[i])
+                    d.append(degree - 1)
+                    d.append('^')
+                    d.append('*')
+                    d.append('*')
+                    if c > 0:
+                        d.append(eq[i+4])
+                else:
+                    degree = eq[i + 1]
+                    d.append(degree)
+                    d.append(eq[i])
+                    d.append(degree - 1)
+                    d.append('^')
+                    d.append('*')
+                    if c > 0:
+                        d.append(eq[i + 3])
+            else:
+                if str(eq[i+1]) == "*":
+                    d.append(eq[i-1])
+                    if c > 0:
+                        d.append(eq[i + 2])
+                else:
+                    d.append(1.0)
+                    if c > 0:
+                        d.append(eq[i + 1])
+            c += 1
+        i += 1
+    d.append(eq[-4])
+    d.append(eq[-3])
+    if eq[-2] == 'x_1':
+        d.append(1.0)
+        d.append(eq[-1])
+    return d
 
 
 def check_convergence(stm, a, b):
-    p1x1 = derivative_equation(stm[0], 0)
-    p2x1 = derivative_equation(stm[1], 0)
-    p1x2 = derivative_equation(stm[0], 1)
-    p2x2 = derivative_equation(stm[1], 1)
+    p1x1 = derivative_equation_by_x1(stm[0])
+    p2x1 = derivative_equation_by_x1(stm[1])
+    p1x2 = derivative_equation_by_x2(stm[0])
+    p2x2 = derivative_equation_by_x2(stm[1])
     a = int(a)
     b = int(b)
-    for x in range(min(a, 0), max(a, 0)+1):
-        for y in range(min(b, 0), max(b, 0)+1):
-            if abs(p1x1[0]*y + p1x1[1]*x) + abs(p1x2[0]*y + p1x2[1]*x) > 1:
+    for x in range(min(a, 0), max(a, 0) + 1):
+        for y in range(min(b, 0), max(b, 0) + 1):
+            if abs(system_func(p1x1, x, y)) + abs(system_func(p1x2, x, y)) > 1:
                 return False
-            if abs(p2x1[0]*y + p2x1[1]*x) + abs(p2x2[0]*y + p2x2[1]*x) > 1:
+            if abs(system_func(p2x1, x, y)) + abs(system_func(p2x2, x, y)) > 1:
                 return False
     return True
 
 
+def express_x(eq, x):
+    a = 1
+    for i in range(len(eq) - 1):
+        if eq[i] == x:
+            if (i < len(eq) - 2 and eq[i + 2] != '^' and eq[i+1] != 'x_2' and eq[i-1] != 'x_1' and eq[i+2] != 'x_2' and eq[i-2] != 'x_1') or i >= len(eq) - 3:
+                if eq[i + 1] == "*":
+                    a = 1 / eq[i - 1]
+                for j in range(i, len(eq)):
+                    if eq[j] == '+':
+                        a *= -1
+                        break
+                    elif eq[j] == '-':
+                        break
+                break
+    eq.append(a)
+    eq.append('*')
+    eq.append(x)
+    eq.append('+')
+    return eq
+
+
 def system_simple_iteration(stm):
+    print("Метод простых итераций")
     accuracy = get_accuracy()
-    system1 = []
-    if stm[0][-2] != 0:
-        x = -stm[0][-2]
-        stm[0][-2] = 0
-        eq = []
-        for y in stm[0]:
-            eq.append(y / x)
-        system1.append(eq)
-    if stm[1][-3] != 0:
-        x = -stm[1][-3]
-        stm[1][-3] = 0
-        eq = []
-        for y in stm[1]:
-            eq.append(y / x)
-        system1.append(eq)
-    print(system1)
+    system1 = [express_x(stm[0], 'x_1'), express_x(stm[1], 'x_2')]
     x1, x2 = get_system_start()
     if check_convergence(system1, x1, x2):
         x_1, x_2 = system_func(system1[0], x1, x2), system_func(system1[1], x1, x2)
@@ -442,15 +579,14 @@ def system_simple_iteration(stm):
         deviation2 = abs(x2 - x_2)
         count = 1
         while accuracy < deviation1 or accuracy < deviation2:
-            print(x_1, x_2)
             count += 1
             x1, x2 = x_1, x_2
             x_1, x_2 = system_func(system1[0], x1, x2), system_func(system1[1], x1, x2)
             deviation1 = abs(x1 - x_1)
             deviation2 = abs(x2 - x_2)
-        print(x_1, x_2)
-        print(count)
-        print(deviation1, deviation2)
+        print("Корни: %.5f ; %.5f" % (x_1, x_2))
+        print("Число итераций: ", count)
+        print("Погрешности: %.5f ; %.5f" % (deviation1, deviation2))
     else:
         print("Достаточное условие сходимости не выполняется")
 
@@ -462,7 +598,7 @@ def to_pol_format(st):
     symb = {'-': 0, '+': 0, '*': 1, '^': 2, 'cos': 3, 'sin': 3}
     for s in a:
         if s not in symb:
-            if s != "x":
+            if s != "x" and s != "x_1" and s != "x_2":
                 res.append(float(s))
             else:
                 res.append(s)
@@ -494,7 +630,7 @@ if enter_value(1, 2) == 1:
     equations = []
     try:
         for x in range(1, count + 1):
-            e = f.readline()
+            e = f.readline().replace('\n', '')
             s = str(x) + '. ' + e
             equations.append(to_pol_format(e))
             print(s)
@@ -514,12 +650,25 @@ if enter_value(1, 2) == 1:
     except ValueError:
         print("Ошибка в введенном уравнении")
 else:
-    systems = [[[0.2, 0.1, 0, 0, 1, -0.3], [0, 0.2, 0.1, 1, 0, -0.7]], [[0, 0, 0, 2, -5, -10], [1, 1, 0, 1, 0, -20]]]
+    f = open("systems.txt")
+    count = int(f.readline())
     print("Выберите систему нелинейных уравнений:")
-    print("1. 0.1x_1^2 + x_1 + 0.2x_2^2 - 0.3 = 0")
-    print("   0.2x_1^2 + x_2 + 0.1x_1x_2 - 0.7 = 0")
-    print("2. 0.5x_2^2 + 0.2x_1^2 + x_1x_2 + 2x_2 + x_1 - 5 = 0")
-    print("   2x_2^2 + 0.2x_1^2 + 0.7x_1x_2 + x_2 + 0.8x_1 - 7 = 0")
-    number = enter_value(1, 2)
-    system = systems[number-1]
-    system_simple_iteration(system)
+    systems = []
+    try:
+        for x in range(1, count + 1):
+            system = []
+            e = f.readline().replace('\n', '')
+            s = str(x) + '. ' + e + " = 0"
+            system.append(to_pol_format(e))
+            print(s)
+            e = f.readline().replace('\n', '')
+            s = '   ' + e + " = 0"
+            system.append(to_pol_format(e))
+            print(s)
+            systems.append(system)
+        number = enter_value(1, 2)
+        system = systems[number - 1]
+        show_system_graph(number)
+        system_simple_iteration(system)
+    except ValueError:
+        print("Ошибка в введенном уравнении")
