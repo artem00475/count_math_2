@@ -74,8 +74,12 @@ def get_interval(eq):
                 flagb = True
             except ValueError:
                 print("Повторите ввод")
-        if func(eq, a) * func(eq, b) > 0:
+        der = derivative(eq)
+        if func(eq, a) * func(eq, b) > 0 and func(der, a) * func(der, b) > 0:
             print("На данном интервале нет корней. Повторите ввод")
+        elif func(der, a) * func(der, b) < 0:
+            print("На интервале несколько корней")
+            return a, b
         else:
             return a, b
 
@@ -219,9 +223,12 @@ def get_data_from_file(a, eq):
                 raise ValueError
             begin = float(inp[0])
             end = float(inp[1])
-            if func(eq, begin) * func(eq, end) > 0:
+            der = derivative(eq)
+            if func(eq, begin) * func(eq, end) > 0 and func(der, begin) * func(der, end) > 0:
                 print("На данном интервале нет корней. Повторите ввод")
                 return False, accuracy, begin, end
+            elif func(der, begin) * func(der, end) < 0:
+                print("На интервале несколько корней")
             return True, accuracy, begin, end
         if a == 1:
             begin = float(file.readline())
@@ -238,6 +245,7 @@ def get_data_from_file(a, eq):
     except ValueError:
         print("Некорректные данные")
         return False, 0, 0, 0
+
 
 def chord_method(eq, num):
     print("Метод хорд")
