@@ -5,9 +5,9 @@ import numpy as np
 def show_graph(a, b, num):
     x = np.arange(a, b + 0.01, 0.01)
     if num == 1:
-        plt.plot(x, x**3-0.77*x**2-1.251*x+0.43)
+        plt.plot(x, x ** 3 - 0.77 * x ** 2 - 1.251 * x + 0.43)
     elif num == 2:
-        plt.plot(x, x**2 - x + 4)
+        plt.plot(x, x ** 2 - x + 4)
     plt.grid(True)
     plt.show()
 
@@ -38,7 +38,7 @@ def get_accuracy():
     return accuracy
 
 
-def get_interval(e):
+def get_interval(eq):
     while True:
         print("Введите левую границу интервала")
         flaga = False
@@ -58,7 +58,7 @@ def get_interval(e):
                 flagb = True
             except ValueError:
                 print("Повторите ввод")
-        if func(e, a)*func(e, b) > 0:
+        if func(eq, a) * func(eq, b) > 0:
             print("На данном интервале нет корней. Повторите ввод")
         else:
             return a, b
@@ -74,13 +74,13 @@ def equation_to_string(eq):
             s += str(abs(eq[i]))
         if degree > 1:
             s += "x^" + str(degree)
-            if eq[i+1] > 0:
+            if eq[i + 1] > 0:
                 s += ' + '
             else:
                 s += ' - '
         elif degree == 1:
             s += "x"
-            if eq[i+1] >= 0:
+            if eq[i + 1] >= 0:
                 s += ' + '
             else:
                 s += ' - '
@@ -98,7 +98,7 @@ def func(eq, x):
 
 
 def calculate_x_for_chord_method(a, b, fa, fb):
-    return (a*fb - b*fa)/(fb-fa)
+    return (a * fb - b * fa) / (fb - fa)
 
 
 def print_table(table):
@@ -125,6 +125,7 @@ def print_table_to_file(table):
             else:
                 f.write('%.5f    ' % c)
         f.write('\n')
+
 
 def print_to_output(table, x, count, fx):
     print_table(table)
@@ -166,7 +167,7 @@ def chord_method(eq, num):
     fb = func(eq, b)
     x = calculate_x_for_chord_method(a, b, fa, fb)
     fx = func(eq, x)
-    deviation = min(abs(x-a), abs(x-b))
+    deviation = min(abs(x - a), abs(x - b))
     table.append([0, a, b, x, fa, fb, fx, deviation])
     count = 0
     while accuracy < abs(fx) or accuracy < deviation:
@@ -208,7 +209,7 @@ def get_initial_approximation(eq):
 
 
 def calculate_x_for_secant_method(a, b, fa, fb):
-    return b - fb*(b - a)/(fb - fa)
+    return b - fb * (b - a) / (fb - fa)
 
 
 def secant_method(eq, num):
@@ -253,7 +254,7 @@ def simple_iteration_method(eq, num):
     a, b = get_interval(eq)
     a0, b0 = a, b
     der = derivative(eq)
-    alpha = -1/max(abs(func(der, a)), abs(func(der, b)))
+    alpha = -1 / max(abs(func(der, a)), abs(func(der, b)))
     phi = []
     for i in range(len(eq)):
         phi.append(eq[i] * alpha)
@@ -278,6 +279,142 @@ def simple_iteration_method(eq, num):
     show_graph(a0 - 1, b0 + 1, num)
 
 
+def get_system_start():
+    while True:
+        print("Введите начальное приближение первого корня")
+        flaga = False
+        a = 0
+        while not flaga:
+            try:
+                a = float(input())
+                flaga = True
+            except ValueError:
+                print("Повторите ввод")
+        print("Введите начальное приближение второго корня")
+        flagb = False
+        b = 0
+        while not flagb:
+            try:
+                b = float(input())
+                flagb = True
+            except ValueError:
+                print("Повторите ввод")
+        if a == b == 0:
+            print("Некорректные приближения. Повторите ввод")
+        else:
+            return a, b
+
+
+def system_func(eq, x1, x2):
+    res = eq[-1]
+    for i in range(len(eq) - 2, -1, -1):
+        degree = (len(eq) - i + 1) // 3
+        index = (len(eq) - i + 1) % 3
+        if index == 0:
+            res += eq[i]*(x1**degree)
+        elif index == 1:
+            res += eq[i]*(x2**degree)
+        else:
+            res += eq[i]*(x1**degree)*(x2**degree)
+    res = round(res, 5)
+    if abs(res) == 0:
+        res = 0
+    return res
+
+
+def derivative_equation(eq, a):
+    res = [0, 0]
+    for i in range(len(eq) - 2, -1, -1):
+        degree = (len(eq) - i + 1) // 3
+        index = (len(eq) - i + 1) % 3
+        if index == a:
+            res[1-a] += eq[i]*degree
+        elif index == 2:
+            res[a] += eq[i]*degree
+    return res
+
+
+def check_convergence(stm, a, b):
+    p1x1 = derivative_equation(stm[0], 0)
+    p2x1 = derivative_equation(stm[1], 0)
+    p1x2 = derivative_equation(stm[0], 1)
+    p2x2 = derivative_equation(stm[1], 1)
+    a = int(a)
+    b = int(b)
+    for x in range(min(a, 0), max(a, 0)+1):
+        for y in range(min(b, 0), max(b, 0)+1):
+            if abs(p1x1[0]*y + p1x1[1]*x) + abs(p1x2[0]*y + p1x2[1]*x) > 1:
+                return False
+            if abs(p2x1[0]*y + p2x1[1]*x) + abs(p2x2[0]*y + p2x2[1]*x) > 1:
+                return False
+    return True
+
+
+def system_simple_iteration(stm):
+    accuracy = get_accuracy()
+    system1 = []
+    if stm[0][-2] != 0:
+        x = -stm[0][-2]
+        stm[0][-2] = 0
+        eq = []
+        for y in stm[0]:
+            eq.append(y / x)
+        system1.append(eq)
+    if stm[1][-3] != 0:
+        x = -stm[1][-3]
+        stm[1][-3] = 0
+        eq = []
+        for y in stm[1]:
+            eq.append(y / x)
+        system1.append(eq)
+    print(system1)
+    x1, x2 = get_system_start()
+    if check_convergence(system1, x1, x2):
+        x_1, x_2 = system_func(system1[0], x1, x2), system_func(system1[1], x1, x2)
+        deviation1 = abs(x1 - x_1)
+        deviation2 = abs(x2 - x_2)
+        count = 1
+        while accuracy < deviation1 or accuracy < deviation2:
+            print(x_1, x_2)
+            count += 1
+            x1, x2 = x_1, x_2
+            x_1, x_2 = system_func(system1[0], x1, x2), system_func(system1[1], x1, x2)
+            deviation1 = abs(x1 - x_1)
+            deviation2 = abs(x2 - x_2)
+        print(x_1, x_2)
+        print(count)
+        print(deviation1, deviation2)
+    else:
+        print("Достаточное условие сходимости не выполняется")
+
+
+def to_pol_format(st):
+    a = st.split()
+    res = []
+    op = []
+    symb = {'-': 0, '+': 0, '*': 1, '^': 2, 'cos': 3, 'sin': 3}
+    for s in a:
+        if s not in symb:
+            res.append(s)
+        else:
+            if len(op) == 0:
+                op.append(s)
+            else:
+                sm = op.pop()
+                if symb[s] <= symb[sm]:
+                    res.append(sm)
+                    while len(op) > 0 and symb[s] <= symb[op[-1]]:
+                        sm = op.pop()
+                        res.append(sm)
+                else:
+                    op.append(sm)
+                op.append(s)
+    #     print(res, op)
+    while len(op) > 0:
+        res.append(op.pop())
+    print(res)
+
+
 print("Выберите, что хотите решить:")
 print("1. Нелинейное уравнение")
 print("2. Система нелинейных уравнений")
@@ -293,7 +430,10 @@ if enter_value(1, 2) == 1:
             equations.append(e)
             print(s)
         number = enter_value(1, count)
-        equation = equations[number-1]
+        equation = equations[number - 1]
+        to_pol_format('x ^ 3 - 0.77 * x ^ 2 - 1.251 * x + 0.43')
+        to_pol_format('x ^ 3 - x + 4.0')
+        to_pol_format('20 * cos x + x ^ 2')
         print("ВЫберите метод:")
         print("1. Метод хорд")
         print("2. Метод секущих")
@@ -308,4 +448,12 @@ if enter_value(1, 2) == 1:
     except ValueError:
         print("Ошибка в введенном уравнении")
 else:
+    systems = [[[0.2, 0.1, 0, 0, 1, -0.3], [0, 0.2, 0.1, 1, 0, -0.7]], [[0, 0, 0, 2, -5, -10], [1, 1, 0, 1, 0, -20]]]
     print("Выберите систему нелинейных уравнений:")
+    print("1. 0.1x_1^2 + x_1 + 0.2x_2^2 - 0.3 = 0")
+    print("   0.2x_1^2 + x_2 + 0.1x_1x_2 - 0.7 = 0")
+    print("2. 0.5x_2^2 + 0.2x_1^2 + x_1x_2 + 2x_2 + x_1 - 5 = 0")
+    print("   2x_2^2 + 0.2x_1^2 + 0.7x_1x_2 + x_2 + 0.8x_1 - 7 = 0")
+    number = enter_value(1, 2)
+    system = systems[number-1]
+    system_simple_iteration(system)
