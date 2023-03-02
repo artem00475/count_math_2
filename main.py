@@ -8,6 +8,8 @@ def show_graph(a, b, num):
         plt.plot(x, x ** 3 - 0.77 * x ** 2 - 1.251 * x + 0.43)
     elif num == 2:
         plt.plot(x, x ** 2 - x + 4)
+    elif num == 3:
+        plt.plot(x, 20*np.cos(x)+x**2)
     plt.grid(True)
     plt.show()
 
@@ -307,12 +309,6 @@ def derivative(eq):
             d.append(i)
         else:
             break
-    # print(d)
-
-
-    # for i in range(len(eq) - 1):
-    #     degree = len(eq) - 1 - i
-    #     d.append(eq[i] * degree)
     return d
 
 
@@ -485,7 +481,6 @@ def to_pol_format(st):
                 op.append(s)
     while len(op) > 0:
         res.append(op.pop())
-    print(res)
     return res
 
 
@@ -499,15 +494,12 @@ if enter_value(1, 2) == 1:
     equations = []
     try:
         for x in range(1, count + 1):
-            # e = [float(y) for y in f.readline().split()]
-            # s = str(x) + '. ' + equation_to_string(e)
             e = f.readline()
             s = str(x) + '. ' + e
             equations.append(to_pol_format(e))
             print(s)
         number = enter_value(1, count)
         equation = equations[number - 1]
-        derivative(equation)
         print("ВЫберите метод:")
         print("1. Метод хорд")
         print("2. Метод секущих")
