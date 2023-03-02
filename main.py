@@ -660,7 +660,7 @@ def express_x(eq, x):
 def system_simple_iteration(stm):
     print("Метод простых итераций")
     accuracy = get_accuracy()
-    system1 = [express_x(stm[0], 'x_1'), express_x(stm[1], 'x_2')]
+    system1 = [express_x(stm[0].copy(), 'x_1'), express_x(stm[1].copy(), 'x_2')]
     x1, x2 = get_system_start()
     if check_convergence(system1, x1, x2):
         x_1, x_2 = system_func(system1[0], x1, x2), system_func(system1[1], x1, x2)
@@ -676,6 +676,10 @@ def system_simple_iteration(stm):
         print("Корни: %.5f ; %.5f" % (x_1, x_2))
         print("Число итераций: ", count)
         print("Погрешности: %.5f ; %.5f" % (deviation1, deviation2))
+        if abs(system_func(stm[0], x_1, x_2)) <= accuracy and abs(system_func(stm[1], x_1, x_2)) <= accuracy:
+            print("Решение корректно")
+        else:
+            print("Решение некорректно")
     else:
         print("Достаточное условие сходимости не выполняется")
 
