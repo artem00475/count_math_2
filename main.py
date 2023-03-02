@@ -200,33 +200,85 @@ def print_result(table, x, count, fx):
             print("Повторите ввод")
 
 
+def get_data_from_file(a, eq):
+    file = None
+    while True:
+        name = input("Введите имя файла: ")
+        try:
+            file = open(name)
+            break
+        except FileNotFoundError:
+            print("Файл не найден")
+    try:
+        accuracy = float(file.readline())
+        if accuracy <= 0 or accuracy >= 1:
+            raise ValueError
+        inp = file.readline().split()
+        if a == 2:
+            if len(inp) != 2:
+                raise ValueError
+            begin = float(inp[0])
+            end = float(inp[1])
+            if func(eq, begin) * func(eq, end) > 0:
+                print("На данном интервале нет корней. Повторите ввод")
+                return False, accuracy, begin, end
+            return True, accuracy, begin, end
+        if a == 1:
+            begin = float(file.readline())
+            b1 = begin - 0.5
+            b2 = begin + 0.5
+            while True:
+                if func(eq, begin) * func(eq, b1) < 0:
+                    return True, accuracy, begin, b1
+                elif func(eq, begin) * func(eq, b2) < 0:
+                    return True, accuracy, begin, b2
+                else:
+                    b1 -= 0.5
+                    b2 += 0.5
+    except ValueError:
+        print("Некорректные данные")
+        return False, 0, 0, 0
+
 def chord_method(eq, num):
     print("Метод хорд")
-    table = [["   №   ", "   a   ", "   b   ", "   x   ", "  F(a)  ", "  F(b)  ", "  F(x)  ", "|x_n+1 - x_n|"]]
-    accuracy = get_accuracy()
-    a, b = get_interval(eq)
-    a0, b0 = a, b
-    fa = func(eq, a)
-    fb = func(eq, b)
-    x = calculate_x_for_chord_method(a, b, fa, fb)
-    fx = func(eq, x)
-    deviation = min(abs(x - a), abs(x - b))
-    table.append([0, a, b, x, fa, fb, fx, deviation])
-    count = 0
-    while accuracy < abs(fx) or accuracy < deviation:
-        count += 1
-        if fx * fa > 0:
-            a = x
-            fa = fx
+    print("Откуда ввести данные? (k - клавиатура, f - файл)")
+    type = ''
+    while True:
+        type = input()
+        if type in ['f', 'k']:
+            break
         else:
-            b = x
-            fb = fx
+            print("Повторите ввод")
+    table = [["   №   ", "   a   ", "   b   ", "   x   ", "  F(a)  ", "  F(b)  ", "  F(x)  ", "|x_n+1 - x_n|"]]
+    if type == 'k':
+        accuracy = get_accuracy()
+        a, b = get_interval(eq)
+        check = True
+    else:
+        check, accuracy, a, b = get_data_from_file(2, eq)
+    if check:
+        a0, b0 = a, b
+        fa = func(eq, a)
+        fb = func(eq, b)
         x = calculate_x_for_chord_method(a, b, fa, fb)
         fx = func(eq, x)
         deviation = min(abs(x - a), abs(x - b))
-        table.append([count, a, b, x, fa, fb, fx, deviation])
-    print_result(table, table[-1][3], count, fx)
-    show_graph(a0 - 1, b0 + 1, num)
+        table.append([0, a, b, x, fa, fb, fx, deviation])
+        count = 0
+        while accuracy < abs(fx) or accuracy < deviation:
+            count += 1
+            if fx * fa > 0:
+                a = x
+                fa = fx
+            else:
+                b = x
+                fb = fx
+            x = calculate_x_for_chord_method(a, b, fa, fb)
+            fx = func(eq, x)
+            deviation = min(abs(x - a), abs(x - b))
+            table.append([count, a, b, x, fa, fb, fx, deviation])
+        print_result(table, table[-1][3], count, fx)
+        show_graph(a0 - 1, b0 + 1, num)
 
 
 def get_initial_approximation(eq):
@@ -257,29 +309,42 @@ def calculate_x_for_secant_method(a, b, fa, fb):
 
 def secant_method(eq, num):
     print("Метод секущих")
+    print("Откуда ввести данные? (k - клавиатура, f - файл)")
+    type = ''
+    while True:
+        type = input()
+        if type in ['f', 'k']:
+            break
+        else:
+            print("Повторите ввод")
     table = [["   №   ", "x_(k-1)", " x_k ", "x_(k+1)", "f(x_(k+1))", "|x_k+1 - x_k|"]]
-    accuracy = get_accuracy()
-    a, b = get_initial_approximation(eq)
-    a0, b0 = a, b
-    fa = func(eq, a)
-    fb = func(eq, b)
-    x = calculate_x_for_secant_method(a, b, fa, fb)
-    fx = func(eq, x)
-    deviation = abs(x - b)
-    count = 0
-    table.append([count, a, b, x, fx, deviation])
-    while accuracy < abs(fx) or accuracy < deviation:
-        count += 1
-        a = b
-        b = x
-        fa = fb
-        fb = fx
-        x = calculate_x_for_chord_method(a, b, fa, fb)
+    if type == 'k':
+        accuracy = get_accuracy()
+        a, b = get_initial_approximation(eq)
+        check = True
+    else:
+        check, accuracy, a, b = get_data_from_file(1, eq)
+    if check:
+        a0, b0 = a, b
+        fa = func(eq, a)
+        fb = func(eq, b)
+        x = calculate_x_for_secant_method(a, b, fa, fb)
         fx = func(eq, x)
         deviation = abs(x - b)
+        count = 0
         table.append([count, a, b, x, fx, deviation])
-    print_result(table, table[-1][3], count, fx)
-    show_graph(a0 - 1, b0 + 1, num)
+        while accuracy < abs(fx) or accuracy < deviation:
+            count += 1
+            a = b
+            b = x
+            fa = fb
+            fb = fx
+            x = calculate_x_for_chord_method(a, b, fa, fb)
+            fx = func(eq, x)
+            deviation = abs(x - b)
+            table.append([count, a, b, x, fx, deviation])
+        print_result(table, table[-1][3], count, fx)
+        show_graph(a0 - 1, b0 + 1, num)
 
 
 def derivative(eq):
@@ -328,36 +393,49 @@ def derivative(eq):
 
 def simple_iteration_method(eq, num):
     print("Метод простых итераций")
+    print("Откуда ввести данные? (k - клавиатура, f - файл)")
+    type = ''
+    while True:
+        type = input()
+        if type in ['f', 'k']:
+            break
+        else:
+            print("Повторите ввод")
     table = [["   №   ", " x_k ", "x_(k+1)", "f(x_(k+1))", "|x_k+1 - x_k|"]]
-    accuracy = get_accuracy()
-    a, b = get_interval(eq)
-    a0, b0 = a, b
-    der = derivative(eq)
-    alpha = -1 / max(abs(func(der, a)), abs(func(der, b)))
-    phi = eq.copy()
-    phi.append(alpha)
-    phi.append('*')
-    phi.append('x')
-    phi.append('+')
-    print(phi)
-    if abs(func(der, a)) >= abs(func(der, b)):
-        x = a
+    if type == 'k':
+        accuracy = get_accuracy()
+        a, b = get_interval(eq)
+        check = True
     else:
-        x = b
-    phix = func(phi, x)
-    deviation = abs(x - phix)
-    fphi = func(eq, phix)
-    count = 0
-    table.append([count, x, phix, fphi, deviation])
-    while accuracy < abs(fphi) or accuracy < deviation:
-        count += 1
-        x = phix
+        check, accuracy, a, b = get_data_from_file(2, eq)
+    if check:
+        a0, b0 = a, b
+        der = derivative(eq)
+        alpha = -1 / max(abs(func(der, a)), abs(func(der, b)))
+        phi = eq.copy()
+        phi.append(alpha)
+        phi.append('*')
+        phi.append('x')
+        phi.append('+')
+        print(phi)
+        if abs(func(der, a)) >= abs(func(der, b)):
+            x = a
+        else:
+            x = b
         phix = func(phi, x)
-        fphi = func(eq, phix)
         deviation = abs(x - phix)
+        fphi = func(eq, phix)
+        count = 0
         table.append([count, x, phix, fphi, deviation])
-    print_result(table, table[-1][2], count, fphi)
-    show_graph(a0 - 1, b0 + 1, num)
+        while accuracy < abs(fphi) or accuracy < deviation:
+            count += 1
+            x = phix
+            phix = func(phi, x)
+            fphi = func(eq, phix)
+            deviation = abs(x - phix)
+            table.append([count, x, phix, fphi, deviation])
+        print_result(table, table[-1][2], count, fphi)
+        show_graph(a0 - 1, b0 + 1, num)
 
 
 def get_system_start():
@@ -551,8 +629,7 @@ def express_x(eq, x):
     a = 1
     for i in range(len(eq) - 1):
         if eq[i] == x:
-            if (i < len(eq) - 2 and eq[i + 2] != '^' and eq[i + 1] != 'x_2' and eq[i - 1] != 'x_1' and eq[
-                i + 2] != 'x_2' and eq[i - 2] != 'x_1') or i >= len(eq) - 3:
+            if (i < len(eq) - 2 and eq[i + 2] != '^' and eq[i + 1] != 'x_2' and eq[i - 1] != 'x_1' and eq[i + 2] != 'x_2' and eq[i - 2] != 'x_1') or i >= len(eq) - 3:
                 if eq[i + 1] == "*":
                     a = 1 / eq[i - 1]
                 for j in range(i, len(eq)):
