@@ -75,9 +75,9 @@ def get_interval(eq):
             except ValueError:
                 print("Повторите ввод")
         der = derivative(eq)
-        if func(eq, a) * func(eq, b) > 0 and func(der, a) * func(der, b) > 0:
+        if func(eq, a) * func(eq, b) > 0 and func(der, a) * func(der, b/2) > 0:
             print("На данном интервале нет корней. Повторите ввод")
-        elif func(der, a) * func(der, b) < 0:
+        elif func(der, a) * func(der, b/2) < 0:
             print("На интервале несколько корней")
             return a, b
         else:
@@ -224,10 +224,10 @@ def get_data_from_file(a, eq):
             begin = float(inp[0])
             end = float(inp[1])
             der = derivative(eq)
-            if func(eq, begin) * func(eq, end) > 0 and func(der, begin) * func(der, end) > 0:
+            if func(eq, begin) * func(eq, end) > 0 and func(der, begin) * func(der, end/2) > 0:
                 print("На данном интервале нет корней. Повторите ввод")
                 return False, accuracy, begin, end
-            elif func(der, begin) * func(der, end) < 0:
+            elif func(der, begin) * func(der, end/2) < 0:
                 print("На интервале несколько корней")
             return True, accuracy, begin, end
         if a == 1:
@@ -425,25 +425,28 @@ def simple_iteration_method(eq, num):
         phi.append('*')
         phi.append('x')
         phi.append('+')
-        print(phi)
         if abs(func(der, a)) >= abs(func(der, b)):
             x = a
         else:
             x = b
-        phix = func(phi, x)
-        deviation = abs(x - phix)
-        fphi = func(eq, phix)
-        count = 0
-        table.append([count, x, phix, fphi, deviation])
-        while accuracy < abs(fphi) or accuracy < deviation:
-            count += 1
-            x = phix
+        derphi = derivative(phi[:-4]) + [alpha, '*', 1.0, '+']
+        if abs(func(derphi, x)) < 1:
             phix = func(phi, x)
-            fphi = func(eq, phix)
             deviation = abs(x - phix)
+            fphi = func(eq, phix)
+            count = 0
             table.append([count, x, phix, fphi, deviation])
-        print_result(table, table[-1][2], count, fphi)
-        show_graph(a0 - 1, b0 + 1, num)
+            while accuracy < abs(fphi) or accuracy < deviation:
+                count += 1
+                x = phix
+                phix = func(phi, x)
+                fphi = func(eq, phix)
+                deviation = abs(x - phix)
+                table.append([count, x, phix, fphi, deviation])
+            print_result(table, table[-1][2], count, fphi)
+            show_graph(a0 - 1, b0 + 1, num)
+        else:
+            print("Условие сходимости не выполнено")
 
 
 def get_system_start():
