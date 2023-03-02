@@ -18,8 +18,8 @@ def show_graph(a, b, num):
 def show_system_graph(num):
     var('x y')
     if num == 1:
-        p1 = plot_implicit(Eq(0.1*x**2 + x + 0.2*y**2, 0.3), show=False, line_color='r')
-        p2 = plot_implicit(Eq(0.2*x**2 + y + 0.1*x*y, 0.7), show=False)
+        p1 = plot_implicit(Eq(0.1 * x ** 2 + x + 0.2 * y ** 2, 0.3), show=False, line_color='r')
+        p2 = plot_implicit(Eq(0.2 * x ** 2 + y + 0.1 * x * y, 0.7), show=False)
     else:
         p1 = plot_implicit(Eq(0.2 * x ** 2 + x + 0.3 * y ** 2, 0.5), show=False, line_color='r')
         p2 = plot_implicit(Eq(0.4 * x ** 2 + y + 0.2 * x * y, 0.5), show=False)
@@ -423,18 +423,18 @@ def derivative_equation_by_x2(eq):
     i = 0
     while i < len(eq) - 4:
         if str(eq[i]) == 'x_2':
-            if str(eq[i-2]) == 'x_1':
-                if str(eq[i+1]) == '*':
-                    d.append(eq[i-3])
-                    d.append(eq[i-2])
+            if str(eq[i - 2]) == 'x_1':
+                if str(eq[i + 1]) == '*':
+                    d.append(eq[i - 3])
+                    d.append(eq[i - 2])
                     d.append('*')
                     if c > 0:
                         d.append(eq[i + 2])
-            elif str(eq[i-1]) == 'x_1':
+            elif str(eq[i - 1]) == 'x_1':
                 d.append(eq[i - 1])
                 if c > 0:
                     d.append(eq[i + 2])
-            elif i < len(eq) - 2 and str(eq[i+2]) == "^":
+            elif i < len(eq) - 2 and str(eq[i + 2]) == "^":
                 if str(eq[i + 3]) == '*':
                     d.append(eq[i - 1])
                     degree = eq[i + 1]
@@ -445,7 +445,7 @@ def derivative_equation_by_x2(eq):
                     d.append('*')
                     d.append('*')
                     if c > 0:
-                        d.append(eq[i+4])
+                        d.append(eq[i + 4])
                 else:
                     degree = eq[i + 1]
                     d.append(degree)
@@ -456,8 +456,8 @@ def derivative_equation_by_x2(eq):
                     if c > 0:
                         d.append(eq[i + 3])
             else:
-                if str(eq[i+1]) == "*":
-                    d.append(eq[i-1])
+                if str(eq[i + 1]) == "*":
+                    d.append(eq[i - 1])
                     if c > 0:
                         d.append(eq[i + 2])
                 else:
@@ -480,18 +480,18 @@ def derivative_equation_by_x1(eq):
     i = 0
     while i < len(eq) - 4:
         if str(eq[i]) == 'x_1':
-            if str(eq[i+2]) == 'x_2':
-                if str(eq[i+3]) == '*':
-                    d.append(eq[i-1])
-                    d.append(eq[i+2])
+            if str(eq[i + 2]) == 'x_2':
+                if str(eq[i + 3]) == '*':
+                    d.append(eq[i - 1])
+                    d.append(eq[i + 2])
                     d.append('*')
                     if c > 0:
                         d.append(eq[i + 4])
-            elif str(eq[i+1]) == 'x_2':
+            elif str(eq[i + 1]) == 'x_2':
                 d.append(eq[i + 1])
                 if c > 0:
                     d.append(eq[i + 3])
-            elif i < len(eq) - 2 and str(eq[i+2]) == "^":
+            elif i < len(eq) - 2 and str(eq[i + 2]) == "^":
                 if str(eq[i + 3]) == '*':
                     d.append(eq[i - 1])
                     degree = eq[i + 1]
@@ -502,7 +502,7 @@ def derivative_equation_by_x1(eq):
                     d.append('*')
                     d.append('*')
                     if c > 0:
-                        d.append(eq[i+4])
+                        d.append(eq[i + 4])
                 else:
                     degree = eq[i + 1]
                     d.append(degree)
@@ -513,8 +513,8 @@ def derivative_equation_by_x1(eq):
                     if c > 0:
                         d.append(eq[i + 3])
             else:
-                if str(eq[i+1]) == "*":
-                    d.append(eq[i-1])
+                if str(eq[i + 1]) == "*":
+                    d.append(eq[i - 1])
                     if c > 0:
                         d.append(eq[i + 2])
                 else:
@@ -551,7 +551,8 @@ def express_x(eq, x):
     a = 1
     for i in range(len(eq) - 1):
         if eq[i] == x:
-            if (i < len(eq) - 2 and eq[i + 2] != '^' and eq[i+1] != 'x_2' and eq[i-1] != 'x_1' and eq[i+2] != 'x_2' and eq[i-2] != 'x_1') or i >= len(eq) - 3:
+            if (i < len(eq) - 2 and eq[i + 2] != '^' and eq[i + 1] != 'x_2' and eq[i - 1] != 'x_1' and eq[
+                i + 2] != 'x_2' and eq[i - 2] != 'x_1') or i >= len(eq) - 3:
                 if eq[i + 1] == "*":
                     a = 1 / eq[i - 1]
                 for j in range(i, len(eq)):
@@ -620,55 +621,64 @@ def to_pol_format(st):
     return res
 
 
-print("Выберите, что хотите решить:")
-print("1. Нелинейное уравнение")
-print("2. Система нелинейных уравнений")
-if enter_value(1, 2) == 1:
-    f = open("equations.txt")
-    count = int(f.readline())
-    print("Выбирите нелинейное уравнение:")
-    equations = []
-    try:
-        for x in range(1, count + 1):
-            e = f.readline().replace('\n', '')
-            s = str(x) + '. ' + e
-            equations.append(to_pol_format(e))
-            print(s)
-        number = enter_value(1, count)
-        equation = equations[number - 1]
-        print("ВЫберите метод:")
-        print("1. Метод хорд")
-        print("2. Метод секущих")
-        print("3. Метод простых итераций")
-        method = enter_value(1, 3)
-        if method == 1:
-            chord_method(equation, number)
-        elif method == 2:
-            secant_method(equation, number)
-        else:
-            simple_iteration_method(equation, number)
-    except ValueError:
-        print("Ошибка в введенном уравнении")
-else:
-    f = open("systems.txt")
-    count = int(f.readline())
-    print("Выберите систему нелинейных уравнений:")
-    systems = []
-    try:
-        for x in range(1, count + 1):
-            system = []
-            e = f.readline().replace('\n', '')
-            s = str(x) + '. ' + e + " = 0"
-            system.append(to_pol_format(e))
-            print(s)
-            e = f.readline().replace('\n', '')
-            s = '   ' + e + " = 0"
-            system.append(to_pol_format(e))
-            print(s)
-            systems.append(system)
-        number = enter_value(1, 2)
-        system = systems[number - 1]
-        show_system_graph(number)
-        system_simple_iteration(system)
-    except ValueError:
-        print("Ошибка в введенном уравнении")
+work = True
+while work:
+    print("Выберите, что хотите решить:")
+    print("1. Нелинейное уравнение")
+    print("2. Система нелинейных уравнений")
+    if enter_value(1, 2) == 1:
+        f = open("equations.txt")
+        count = int(f.readline())
+        print("Выбирите нелинейное уравнение:")
+        equations = []
+        try:
+            for x in range(1, count + 1):
+                e = f.readline().replace('\n', '')
+                s = str(x) + '. ' + e
+                equations.append(to_pol_format(e))
+                print(s)
+            number = enter_value(1, count)
+            equation = equations[number - 1]
+            print("ВЫберите метод:")
+            print("1. Метод хорд")
+            print("2. Метод секущих")
+            print("3. Метод простых итераций")
+            method = enter_value(1, 3)
+            if method == 1:
+                chord_method(equation, number)
+            elif method == 2:
+                secant_method(equation, number)
+            else:
+                simple_iteration_method(equation, number)
+        except ValueError:
+            print("Ошибка в введенном уравнении")
+    else:
+        f = open("systems.txt")
+        count = int(f.readline())
+        print("Выберите систему нелинейных уравнений:")
+        systems = []
+        try:
+            for x in range(1, count + 1):
+                system = []
+                e = f.readline().replace('\n', '')
+                s = str(x) + '. ' + e + " = 0"
+                system.append(to_pol_format(e))
+                print(s)
+                e = f.readline().replace('\n', '')
+                s = '   ' + e + " = 0"
+                system.append(to_pol_format(e))
+                print(s)
+                systems.append(system)
+            number = enter_value(1, 2)
+            system = systems[number - 1]
+            show_system_graph(number)
+            system_simple_iteration(system)
+        except ValueError:
+            print("Ошибка в введенном уравнении")
+    while True:
+        ans = input("Решить еще одно уравнение? (y/n)\n")
+        if ans == 'n':
+            work = False
+            break
+        elif ans == 'y':
+            break
