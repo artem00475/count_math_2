@@ -90,11 +90,38 @@ def equation_to_string(eq):
 
 
 def func(eq, x):
-    s = 0
-    for i in range(len(eq)):
-        degree = len(eq) - 1 - i
-        s += eq[i] * x ** degree
-    return s
+    s = []
+    symb = {'-': 0, '+': 0, '*': 1, '^': 2, 'cos': 3, 'sin': 3}
+    for i in eq:
+        if i not in symb:
+            if i == 'x':
+                s.append(x)
+            else:
+                s.append(i)
+        else:
+            if i == '-':
+                a = s.pop()
+                b = s.pop()
+                s.append(b - a)
+            elif i == '+':
+                a = s.pop()
+                b = s.pop()
+                s.append(b + a)
+            elif i == '*':
+                a = s.pop()
+                b = s.pop()
+                s.append(b * a)
+            elif i == '^':
+                a = s.pop()
+                b = s.pop()
+                s.append(b ** a)
+            elif i == 'cos':
+                a = s.pop()
+                s.append(np.cos(a))
+            elif i == 'sin':
+                a = s.pop()
+                s.append(np.sin(a))
+    return s[0]
 
 
 def calculate_x_for_chord_method(a, b, fa, fb):
@@ -241,9 +268,51 @@ def secant_method(eq, num):
 
 def derivative(eq):
     d = []
-    for i in range(len(eq) - 1):
-        degree = len(eq) - 1 - i
-        d.append(eq[i] * degree)
+    container = []
+    i = 0
+    while i < len(eq):
+        if str(eq[i]) == '^':
+            degree = eq[i-1]
+            d.append(degree)
+            d += container[:-1]
+            d.append(degree - 1)
+            d.append('^')
+            d.append('*')
+            container = []
+        elif str(eq[i]) == 'sin':
+            d += container
+            container = []
+            d.append('cos')
+        elif str(eq[i]) == 'cos':
+            d.append(-1)
+            d += container
+            container = []
+            d.append('sin')
+            d.append('*')
+            if i < len(eq) - 2 and str(eq[i+1]) == '*':
+                d.append('*')
+                i += 1
+        elif str(eq[i]) == 'x' and i < len(eq) -3 and str(eq[i+2]) != "^" and str(eq[i+1]) != "sin" \
+                and str(eq[i+1]) != "cos":
+            d += container
+            container = []
+            d.append('x')
+            d.append(0)
+            d.append('^')
+        else:
+            container.append(eq[i])
+        i += 1
+    for i in container:
+        if str(i) in ['^', '-', '+', '*']:
+            d.append(i)
+        else:
+            break
+    # print(d)
+
+
+    # for i in range(len(eq) - 1):
+    #     degree = len(eq) - 1 - i
+    #     d.append(eq[i] * degree)
     return d
 
 
@@ -255,10 +324,12 @@ def simple_iteration_method(eq, num):
     a0, b0 = a, b
     der = derivative(eq)
     alpha = -1 / max(abs(func(der, a)), abs(func(der, b)))
-    phi = []
-    for i in range(len(eq)):
-        phi.append(eq[i] * alpha)
-    phi[-2] += 1
+    phi = eq.copy()
+    phi.append(alpha)
+    phi.append('*')
+    phi.append('x')
+    phi.append('+')
+    print(phi)
     if abs(func(der, a)) >= abs(func(der, b)):
         x = a
     else:
@@ -395,7 +466,10 @@ def to_pol_format(st):
     symb = {'-': 0, '+': 0, '*': 1, '^': 2, 'cos': 3, 'sin': 3}
     for s in a:
         if s not in symb:
-            res.append(s)
+            if s != "x":
+                res.append(float(s))
+            else:
+                res.append(s)
         else:
             if len(op) == 0:
                 op.append(s)
@@ -409,10 +483,10 @@ def to_pol_format(st):
                 else:
                     op.append(sm)
                 op.append(s)
-    #     print(res, op)
     while len(op) > 0:
         res.append(op.pop())
     print(res)
+    return res
 
 
 print("Выберите, что хотите решить:")
@@ -425,15 +499,15 @@ if enter_value(1, 2) == 1:
     equations = []
     try:
         for x in range(1, count + 1):
-            e = [float(y) for y in f.readline().split()]
-            s = str(x) + '. ' + equation_to_string(e)
-            equations.append(e)
+            # e = [float(y) for y in f.readline().split()]
+            # s = str(x) + '. ' + equation_to_string(e)
+            e = f.readline()
+            s = str(x) + '. ' + e
+            equations.append(to_pol_format(e))
             print(s)
         number = enter_value(1, count)
         equation = equations[number - 1]
-        to_pol_format('x ^ 3 - 0.77 * x ^ 2 - 1.251 * x + 0.43')
-        to_pol_format('x ^ 3 - x + 4.0')
-        to_pol_format('20 * cos x + x ^ 2')
+        derivative(equation)
         print("ВЫберите метод:")
         print("1. Метод хорд")
         print("2. Метод секущих")
