@@ -3,6 +3,7 @@ import numpy as np
 from sympy import *
 
 
+#Отображения графика уравнения
 def show_graph(a, b, num):
     x = np.arange(a, b + 0.01, 0.01)
     if num == 1:
@@ -14,7 +15,7 @@ def show_graph(a, b, num):
     plt.grid(True)
     plt.show()
 
-
+#Отображения графика системы уравнений
 def show_system_graph(num):
     var('x y')
     if num == 1:
@@ -28,6 +29,7 @@ def show_system_graph(num):
     p2.show()
 
 
+#Считывание числа с клавиатуры
 def enter_value(b, c):
     a = 0
     while a < b or a > c:
@@ -40,6 +42,7 @@ def enter_value(b, c):
     return a
 
 
+#Считывание точности с клавиатуры
 def get_accuracy():
     print("Введите желаемую точность в виде десятичной дроби")
     accuracy = False
@@ -54,6 +57,7 @@ def get_accuracy():
     return accuracy
 
 
+#Считывание интервала для нахождения корня с клавиатуры
 def get_interval(eq):
     while True:
         print("Введите левую границу интервала")
@@ -84,31 +88,7 @@ def get_interval(eq):
             return a, b
 
 
-def equation_to_string(eq):
-    s = ''
-    for i in range(len(eq)):
-        degree = len(eq) - i - 1
-        if eq[i] == 0:
-            continue
-        if abs(eq[i]) != 1:
-            s += str(abs(eq[i]))
-        if degree > 1:
-            s += "x^" + str(degree)
-            if eq[i + 1] > 0:
-                s += ' + '
-            else:
-                s += ' - '
-        elif degree == 1:
-            s += "x"
-            if eq[i + 1] >= 0:
-                s += ' + '
-            else:
-                s += ' - '
-        else:
-            continue
-    return s
-
-
+#Вычисление значение функции
 def func(eq, x):
     s = []
     symb = {'-': 0, '+': 0, '*': 1, '^': 2, 'cos': 3, 'sin': 3}
@@ -148,6 +128,7 @@ def calculate_x_for_chord_method(a, b, fa, fb):
     return (a * fb - b * fa) / (fb - fa)
 
 
+#Вывод таблицы с итерациями в потока вывода
 def print_table(table):
     for c in table[0]:
         print(c, end='    ')
@@ -161,7 +142,8 @@ def print_table(table):
         print()
 
 
-def print_table_to_file(table):
+#Вывод таблицы с итерациями в файл
+def print_table_to_file(table, f):
     for c in table[0]:
         f.write(c + '    ')
     f.write('\n')
@@ -174,6 +156,7 @@ def print_table_to_file(table):
         f.write('\n')
 
 
+#Вывод результата в поток вывода
 def print_to_output(table, x, count, fx):
     print_table(table)
     print("Корень: %.5f" % x)
@@ -181,16 +164,18 @@ def print_to_output(table, x, count, fx):
     print("Значение функции: %.5f" % fx)
 
 
+#Вывод результата в файл
 def print_to_file(table, x, count, fx):
     name = input("Введите имя файла: ")
     f = open(name, 'w')
-    print_table_to_file(table)
+    print_table_to_file(table, f)
     f.write("Корень: %.5f\n" % x)
     f.write("Число итераций:" + str(count + 1) + '\n')
     f.write("Значение функции: %.5f\n" % fx)
     f.close()
 
 
+#Вывод результата
 def print_result(table, x, count, fx):
     while True:
         t = input("Для вывода в консоль введите c, для сохранения в файл введите f: ")
@@ -204,6 +189,7 @@ def print_result(table, x, count, fx):
             print("Повторите ввод")
 
 
+#Считывание исходных данных из файла
 def get_data_from_file(a, eq):
     file = None
     while True:
@@ -289,6 +275,7 @@ def chord_method(eq, num):
         show_graph(a0 - 1, b0 + 1, num)
 
 
+#Считывание начального приближения из консоли
 def get_initial_approximation(eq):
     print("Введите начальное приближение корня")
     flaga = False
@@ -355,6 +342,7 @@ def secant_method(eq, num):
         show_graph(a0 - 1, b0 + 1, num)
 
 
+#Вычисление производной функции
 def derivative(eq):
     d = []
     container = []
@@ -449,6 +437,7 @@ def simple_iteration_method(eq, num):
             print("Условие сходимости не выполнено")
 
 
+#Считывание начальных данных для решения системы
 def get_system_start():
     while True:
         print("Введите начальное приближение первого корня")
@@ -475,6 +464,7 @@ def get_system_start():
             return a, b
 
 
+#Вычисление значения функции от двух переменных
 def system_func(eq, x1, x2):
     s = []
     symb = ['-', '+', '*', '^']
@@ -506,6 +496,7 @@ def system_func(eq, x1, x2):
     return s[0]
 
 
+#Вычисление значения производной по первой переменной
 def derivative_equation_by_x2(eq):
     d = []
     c = 0
@@ -563,6 +554,7 @@ def derivative_equation_by_x2(eq):
     return d
 
 
+#Вычисление значения производной по второй переменной
 def derivative_equation_by_x1(eq):
     d = []
     c = 0
@@ -620,6 +612,7 @@ def derivative_equation_by_x1(eq):
     return d
 
 
+#Проверка сходимости системы
 def check_convergence(stm, a, b):
     p1x1 = derivative_equation_by_x1(stm[0])
     p2x1 = derivative_equation_by_x1(stm[1])
@@ -636,6 +629,7 @@ def check_convergence(stm, a, b):
     return True
 
 
+#Разрешение уравнения относительно х
 def express_x(eq, x):
     a = 1
     for i in range(len(eq) - 1):
@@ -684,6 +678,7 @@ def system_simple_iteration(stm):
         print("Достаточное условие сходимости не выполняется")
 
 
+#Преобразование уравнения в обратную польскую запись
 def to_pol_format(st):
     a = st.split()
     res = []
