@@ -54,7 +54,7 @@ def get_interval(eq):
         if func(eq, a) * func(eq, b) > 0 and func(der, a) * func(der, b / 2) > 0:
             print("На данном интервале нет корней. Повторите ввод")
         elif func(der, a) * func(der, b / 2) < 0:
-            print("На интервале несколько корней")
+            print("На интервале может содержаться несколько корней")
             return a, b
         else:
             return a, b
