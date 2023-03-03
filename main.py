@@ -233,6 +233,7 @@ def get_data_from_file(a, eq):
         return False, 0, 0, 0
 
 
+#Метод хорд
 def chord_method(eq, num):
     print("Метод хорд")
     print("Откуда ввести данные? (k - клавиатура, f - файл)")
