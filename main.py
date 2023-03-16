@@ -4,6 +4,23 @@ from graph_utils import *
 from system_utils import *
 
 
+def get_data(eq):
+    print("Откуда ввести данные? (k - клавиатура, f - файл)")
+    type = ''
+    while True:
+        type = input()
+        if type in ['f', 'k']:
+            break
+        else:
+            print("Повторите ввод")
+    if type == 'k':
+        accuracy = get_accuracy()
+        a, b = get_interval(eq, accuracy)
+        return True, accuracy, a, b
+    else:
+        return get_data_from_file(eq)
+
+
 def calculate_x_for_chord_method(a, b, fa, fb):
     return (a * fb - b * fa) / (fb - fa)
 
@@ -25,21 +42,8 @@ def print_result(table, x, count, fx):
 # Метод хорд
 def chord_method(eq, num):
     print("Метод хорд")
-    print("Откуда ввести данные? (k - клавиатура, f - файл)")
-    type = ''
-    while True:
-        type = input()
-        if type in ['f', 'k']:
-            break
-        else:
-            print("Повторите ввод")
     table = [["   №   ", "   a   ", "   b   ", "   x   ", "  F(a)  ", "  F(b)  ", "  F(x)  ", "|x_n+1 - x_n|"]]
-    if type == 'k':
-        accuracy = get_accuracy()
-        a, b = get_interval(eq, accuracy)
-        check = True
-    else:
-        check, accuracy, a, b = get_data_from_file(eq)
+    check, accuracy, a, b = get_data(eq)
     if check:
         a0, b0 = a, b
         fa = func(eq, a)
@@ -71,21 +75,8 @@ def calculate_x_for_secant_method(a, b, fa, fb):
 
 def secant_method(eq, num):
     print("Метод секущих")
-    print("Откуда ввести данные? (k - клавиатура, f - файл)")
-    type = ''
-    while True:
-        type = input()
-        if type in ['f', 'k']:
-            break
-        else:
-            print("Повторите ввод")
     table = [["   №   ", "x_(k-1)", " x_k ", "x_(k+1)", "f(x_(k+1))", "|x_k+1 - x_k|"]]
-    if type == 'k':
-        accuracy = get_accuracy()
-        a, b = get_interval(eq, accuracy)
-        check = True
-    else:
-        check, accuracy, a, b = get_data_from_file(eq)
+    check, accuracy, a, b = get_data(eq)
     if check:
         a0, b0 = a, b
         a, b = get_initial_approximation(eq, a, b, accuracy)
@@ -112,21 +103,8 @@ def secant_method(eq, num):
 
 def simple_iteration_method(eq, num):
     print("Метод простых итераций")
-    print("Откуда ввести данные? (k - клавиатура, f - файл)")
-    type = ''
-    while True:
-        type = input()
-        if type in ['f', 'k']:
-            break
-        else:
-            print("Повторите ввод")
     table = [["   №   ", " x_k ", "x_(k+1)", "f(x_(k+1))", "|x_k+1 - x_k|"]]
-    if type == 'k':
-        accuracy = get_accuracy()
-        a, b = get_interval(eq, accuracy)
-        check = True
-    else:
-        check, accuracy, a, b = get_data_from_file(eq)
+    check, accuracy, a, b = get_data(eq)
     if check:
         a0, b0 = a, b
         der = derivative(eq)
