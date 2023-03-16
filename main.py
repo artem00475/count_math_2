@@ -171,17 +171,26 @@ def system_simple_iteration(stm):
     accuracy = get_accuracy()
     system1 = [express_x(stm[0].copy(), 'x_1'), express_x(stm[1].copy(), 'x_2')]
     x1, x2 = get_system_start()
-    if check_convergence(system1, x1, x2):
-        x_1, x_2 = system_func(system1[0], x1, x2), system_func(system1[1], x1, x2)
+    if not check_convergence(system1, x1, x2):
+        print("Достаточное условие сходимости не выполняется")
+    x_1, x_2 = system_func(system1[0], x1, x2), system_func(system1[1], x1, x2)
+    deviation1 = abs(x1 - x_1)
+    deviation2 = abs(x2 - x_2)
+    count = 1
+    flag = True
+    while accuracy < deviation1 or accuracy < deviation2:
+        count += 1
+        if count == 1001:
+            break
+        x1, x2 = x_1, x_2
+        try:
+            x_1, x_2 = system_func(system1[0], x1, x2), system_func(system1[1], x1, x2)
+        except OverflowError:
+            flag = False
+            break
         deviation1 = abs(x1 - x_1)
         deviation2 = abs(x2 - x_2)
-        count = 1
-        while accuracy < deviation1 or accuracy < deviation2:
-            count += 1
-            x1, x2 = x_1, x_2
-            x_1, x_2 = system_func(system1[0], x1, x2), system_func(system1[1], x1, x2)
-            deviation1 = abs(x1 - x_1)
-            deviation2 = abs(x2 - x_2)
+    if count <= 1000 and flag:
         print("Корни: %.5f ; %.5f" % (x_1, x_2))
         print("Число итераций: ", count)
         print("Погрешности: %.5f ; %.5f" % (deviation1, deviation2))
@@ -190,7 +199,7 @@ def system_simple_iteration(stm):
         else:
             print("Решение некорректно")
     else:
-        print("Достаточное условие сходимости не выполняется")
+        print("Превышен лимит итераций")
 
 
 # Преобразование уравнения в обратную польскую запись

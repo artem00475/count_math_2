@@ -19,8 +19,6 @@ def get_system_start():
                 flagb = True
             except ValueError:
                 print("Повторите ввод")
-        if a == b == 0:
-            print("Некорректные приближения. Повторите ввод")
         else:
             return a, b
 
