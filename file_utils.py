@@ -1,3 +1,4 @@
+from console_utils import check_interval
 from func_utils import *
 
 
@@ -45,21 +46,12 @@ def get_data_from_file(eq):
             raise ValueError
         begin = float(inp[0])
         end = float(inp[1])
-        der = derivative(eq)
-        k = 0
-        index = begin
-        prev = func(eq, begin)
-        while index < end + 0.1:
-            if prev * func(eq, index) < 0:
-                k += 1
-                prev = func(eq, index)
-            index += 0.1
-        if k == 0:
+        exist, begin, end = check_interval(eq, begin, end, accuracy)
+        if exist:
+            return True, accuracy, begin, end
+        else:
             print("На данном интервале нет корней.")
             return False, accuracy, begin, end
-        elif k > 1:
-            print("На интервале", k, "корней.")
-        return True, accuracy, begin, end
     except ValueError:
         print("Некорректные данные")
         return False, 0, 0, 0

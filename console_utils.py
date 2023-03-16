@@ -30,7 +30,7 @@ def get_accuracy():
 
 
 # Считывание интервала для нахождения корня с клавиатуры
-def get_interval(eq):
+def get_interval(eq, accur):
     while True:
         print("Введите левую границу интервала")
         flaga = False
@@ -50,22 +50,35 @@ def get_interval(eq):
                 flagb = True
             except ValueError:
                 print("Повторите ввод")
-        # der = derivative(eq)
-        k = 0
-        index = a
-        prev = func(eq, a)
-        while index < b+0.1:
-            if prev * func(eq, index) < 0:
-                k += 1
-                prev = func(eq, index)
-            index += 0.1
-        if k == 0:
-            print("На данном интервале нет корней. Повторите ввод")
-        elif k > 1:
-            print("На интервале", k, "корней.")
+        exist, a, b = check_interval(eq, a, b, accur)
+        if exist:
             return a, b
-        else:
-            return a, b
+        print("На данном интервале нет корней. Повторите ввод")
+
+
+def check_interval(eq, a, b, accur):
+    k = 0
+    index = a
+    prev = func(eq, a)
+    intervals = [a]
+    while index < b + accur:
+        if prev * func(eq, index) < 0:
+            k += 1
+            intervals.append(index)
+            prev = func(eq, index)
+        index += accur
+    intervals[-1] = b
+    if k == 0:
+        return False, 0, 0
+    elif k > 1:
+        print("На интервале", k, "корней.")
+        print("Выберите интервал:")
+        for i in range(k):
+            print(f"{i+1}. [{round(intervals[i], 5)}, {round(intervals[i+1], 5)}]")
+        val = enter_value(1, k)
+        return True, intervals[val-1], intervals[val]
+    else:
+        return True, a, b
 
 
 # Вывод таблицы с итерациями в потока вывода

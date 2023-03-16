@@ -36,7 +36,7 @@ def chord_method(eq, num):
     table = [["   №   ", "   a   ", "   b   ", "   x   ", "  F(a)  ", "  F(b)  ", "  F(x)  ", "|x_n+1 - x_n|"]]
     if type == 'k':
         accuracy = get_accuracy()
-        a, b = get_interval(eq)
+        a, b = get_interval(eq, accuracy)
         check = True
     else:
         check, accuracy, a, b = get_data_from_file(eq)
@@ -82,7 +82,7 @@ def secant_method(eq, num):
     table = [["   №   ", "x_(k-1)", " x_k ", "x_(k+1)", "f(x_(k+1))", "|x_k+1 - x_k|"]]
     if type == 'k':
         accuracy = get_accuracy()
-        a, b = get_interval(eq)
+        a, b = get_interval(eq, accuracy)
         check = True
     else:
         check, accuracy, a, b = get_data_from_file(eq)
@@ -123,7 +123,7 @@ def simple_iteration_method(eq, num):
     table = [["   №   ", " x_k ", "x_(k+1)", "f(x_(k+1))", "|x_k+1 - x_k|"]]
     if type == 'k':
         accuracy = get_accuracy()
-        a, b = get_interval(eq)
+        a, b = get_interval(eq, accuracy)
         check = True
     else:
         check, accuracy, a, b = get_data_from_file(eq)
