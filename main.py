@@ -119,8 +119,8 @@ def simple_iteration_method(eq, num):
         else:
             x = b
         derphi = derivative(phi[:-4]) + [alpha, '*', 1.0, '+']
-        print(func(derphi, a))
-        print(func(derphi, b))
+        # print(func(derphi, a))
+        # print(func(derphi, b))
         if abs(func(derphi, a)) >= 1 or abs(func(derphi, b)) >= 1:
             print("Условие сходимости не выполнено")
         phix = func(phi, x)
@@ -233,6 +233,7 @@ while work:
             print("2. Метод секущих")
             print("3. Метод простых итераций")
             method = enter_value(1, 3)
+            show_graph(-2, 2, number)
             if method == 1:
                 chord_method(equation, number)
             elif method == 2:

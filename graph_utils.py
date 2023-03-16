@@ -9,7 +9,7 @@ def show_graph(a, b, num):
     if num == 1:
         plt.plot(x, x ** 3 - 0.77 * x ** 2 - 1.251 * x + 0.43)
     elif num == 2:
-        plt.plot(x, x ** 2 - x + 4)
+        plt.plot(x, x ** 3 - x + 4)
     elif num == 3:
         plt.plot(x, 20 * np.cos(x) + x ** 2)
     plt.grid(True)
