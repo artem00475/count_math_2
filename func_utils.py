@@ -45,12 +45,24 @@ def derivative(eq):
     while i < len(eq):
         if str(eq[i]) == '^':
             degree = eq[i - 1]
-            d.append(degree)
-            d += container[:-1]
-            d.append(degree - 1)
-            d.append('^')
-            d.append('*')
-            container = []
+            if degree > 0:
+                index = 0
+                for j in range(len(container)):
+                    if container[j] in ['^', '-', '+', '*']:
+                        d.append(container[j])
+                        index = j + 1
+                    else:
+                        break
+                d.append(degree)
+                d += container[index:-1]
+                d.append(degree - 1)
+                d.append('^')
+                d.append('*')
+                container = []
+            else:
+                d += container
+                d.append("^")
+                container = []
         elif str(eq[i]) == 'sin':
             d += container
             container = []
@@ -80,3 +92,22 @@ def derivative(eq):
         else:
             break
     return d
+
+
+# Вычисление начального приближения
+def get_initial_approximation(eq, a, b, accur):
+    derA = func(derivative(derivative(eq)), a)
+    derB = func(derivative(derivative(eq)), b)
+    if func(eq, a) * derA > 0:
+        return a, a + accur
+    elif func(eq, b) * derB > 0:
+        return b, b - accur
+    else:
+        if abs(func(eq, a)) <= abs(func(eq, b)):
+            return a, a + accur
+        else:
+            return b, b - accur
+
+
+# def check_convergence(eq, a, b):
+

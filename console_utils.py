@@ -50,11 +50,19 @@ def get_interval(eq):
                 flagb = True
             except ValueError:
                 print("Повторите ввод")
-        der = derivative(eq)
-        if func(eq, a) * func(eq, b) > 0 and func(der, a) * func(der, b / 2) > 0:
+        # der = derivative(eq)
+        k = 0
+        index = a
+        prev = func(eq, a)
+        while index < b+0.1:
+            if prev * func(eq, index) < 0:
+                k += 1
+                prev = func(eq, index)
+            index += 0.1
+        if k == 0:
             print("На данном интервале нет корней. Повторите ввод")
-        elif func(der, a) * func(der, b / 2) < 0:
-            print("На интервале может содержаться несколько корней")
+        elif k > 1:
+            print("На интервале", k, "корней.")
             return a, b
         else:
             return a, b
@@ -80,26 +88,3 @@ def print_to_output(table, x, count, fx):
     print("Корень: %.5f" % x)
     print("Число итераций:", count + 1)
     print("Значение функции: %.5f" % fx)
-
-
-# Считывание начального приближения из консоли
-def get_initial_approximation(eq):
-    print("Введите начальное приближение корня")
-    flaga = False
-    a = 0
-    while not flaga:
-        try:
-            a = float(input())
-            flaga = True
-        except ValueError:
-            print("Повторите ввод")
-    b1 = a - 0.5
-    b2 = a + 0.5
-    while True:
-        if func(eq, a) * func(eq, b1) < 0:
-            return a, b1
-        elif func(eq, a) * func(eq, b2) < 0:
-            return a, b2
-        else:
-            b1 -= 0.5
-            b2 += 0.5

@@ -27,7 +27,7 @@ def print_to_file(table, x, count, fx):
 
 
 # Считывание исходных данных из файла
-def get_data_from_file(a, eq):
+def get_data_from_file(eq):
     file = None
     while True:
         name = input("Введите имя файла: ")
@@ -41,30 +41,25 @@ def get_data_from_file(a, eq):
         if accuracy <= 0 or accuracy >= 1:
             raise ValueError
         inp = file.readline().split()
-        if a == 2:
-            if len(inp) != 2:
-                raise ValueError
-            begin = float(inp[0])
-            end = float(inp[1])
-            der = derivative(eq)
-            if func(eq, begin) * func(eq, end) > 0 and func(der, begin) * func(der, end / 2) > 0:
-                print("На данном интервале нет корней. Повторите ввод")
-                return False, accuracy, begin, end
-            elif func(der, begin) * func(der, end / 2) < 0:
-                print("На интервале несколько корней")
-            return True, accuracy, begin, end
-        if a == 1:
-            begin = float(file.readline())
-            b1 = begin - 0.5
-            b2 = begin + 0.5
-            while True:
-                if func(eq, begin) * func(eq, b1) < 0:
-                    return True, accuracy, begin, b1
-                elif func(eq, begin) * func(eq, b2) < 0:
-                    return True, accuracy, begin, b2
-                else:
-                    b1 -= 0.5
-                    b2 += 0.5
+        if len(inp) != 2:
+            raise ValueError
+        begin = float(inp[0])
+        end = float(inp[1])
+        der = derivative(eq)
+        k = 0
+        index = begin
+        prev = func(eq, begin)
+        while index < end + 0.1:
+            if prev * func(eq, index) < 0:
+                k += 1
+                prev = func(eq, index)
+            index += 0.1
+        if k == 0:
+            print("На данном интервале нет корней.")
+            return False, accuracy, begin, end
+        elif k > 1:
+            print("На интервале", k, "корней.")
+        return True, accuracy, begin, end
     except ValueError:
         print("Некорректные данные")
         return False, 0, 0, 0

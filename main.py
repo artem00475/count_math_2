@@ -39,7 +39,7 @@ def chord_method(eq, num):
         a, b = get_interval(eq)
         check = True
     else:
-        check, accuracy, a, b = get_data_from_file(2, eq)
+        check, accuracy, a, b = get_data_from_file(eq)
     if check:
         a0, b0 = a, b
         fa = func(eq, a)
@@ -82,12 +82,13 @@ def secant_method(eq, num):
     table = [["   №   ", "x_(k-1)", " x_k ", "x_(k+1)", "f(x_(k+1))", "|x_k+1 - x_k|"]]
     if type == 'k':
         accuracy = get_accuracy()
-        a, b = get_initial_approximation(eq)
+        a, b = get_interval(eq)
         check = True
     else:
-        check, accuracy, a, b = get_data_from_file(1, eq)
+        check, accuracy, a, b = get_data_from_file(eq)
     if check:
         a0, b0 = a, b
+        a, b = get_initial_approximation(eq, a, b, accuracy)
         fa = func(eq, a)
         fb = func(eq, b)
         x = calculate_x_for_secant_method(a, b, fa, fb)
@@ -125,7 +126,7 @@ def simple_iteration_method(eq, num):
         a, b = get_interval(eq)
         check = True
     else:
-        check, accuracy, a, b = get_data_from_file(2, eq)
+        check, accuracy, a, b = get_data_from_file(eq)
     if check:
         a0, b0 = a, b
         der = derivative(eq)
@@ -140,23 +141,29 @@ def simple_iteration_method(eq, num):
         else:
             x = b
         derphi = derivative(phi[:-4]) + [alpha, '*', 1.0, '+']
-        if abs(func(derphi, x)) < 1:
+        print(func(derphi, a))
+        print(func(derphi, b))
+        if abs(func(derphi, a)) >= 1 or abs(func(derphi, b)) >= 1:
+            print("Условие сходимости не выполнено")
+        phix = func(phi, x)
+        deviation = abs(x - phix)
+        fphi = func(eq, phix)
+        count = 0
+        table.append([count, x, phix, fphi, deviation])
+        while accuracy < abs(fphi) or accuracy < deviation:
+            count += 1
+            if count == 1001:
+                break
+            x = phix
             phix = func(phi, x)
-            deviation = abs(x - phix)
             fphi = func(eq, phix)
-            count = 0
+            deviation = abs(x - phix)
             table.append([count, x, phix, fphi, deviation])
-            while accuracy < abs(fphi) or accuracy < deviation:
-                count += 1
-                x = phix
-                phix = func(phi, x)
-                fphi = func(eq, phix)
-                deviation = abs(x - phix)
-                table.append([count, x, phix, fphi, deviation])
+        if count <= 1000:
             print_result(table, table[-1][2], count, fphi)
             show_graph(a0 - 1, b0 + 1, num)
         else:
-            print("Условие сходимости не выполнено")
+            print("Превышен лимит итераций")
 
 
 def system_simple_iteration(stm):
