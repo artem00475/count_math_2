@@ -80,6 +80,7 @@ def secant_method(eq, num):
     if check:
         a0, b0 = a, b
         a, b = get_initial_approximation(eq, a, b, accuracy)
+        print("x0 -", a)
         fa = func(eq, a)
         fb = func(eq, b)
         x = calculate_x_for_secant_method(a, b, fa, fb)
@@ -172,6 +173,7 @@ def system_simple_iteration(stm):
         print("Корни: %.5f ; %.5f" % (x_1, x_2))
         print("Число итераций: ", count)
         print("Погрешности: %.5f ; %.5f" % (deviation1, deviation2))
+        print(system_func(stm[0], x_1, x_2), system_func(stm[1], x_1, x_2))
         if abs(system_func(stm[0], x_1, x_2)) <= accuracy and abs(system_func(stm[1], x_1, x_2)) <= accuracy:
             print("Решение корректно")
         else:

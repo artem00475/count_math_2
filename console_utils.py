@@ -87,11 +87,16 @@ def print_table(table):
         print(c, end='    ')
     print()
     for row in table[1:]:
+        count = 0
         for c in row:
-            if c >= 0:
-                print(' %.5f' % c, end='    ')
+            if count == 0:
+                print(c, end='    ')
+                count += 1
             else:
-                print('%.5f' % c, end='    ')
+                if c >= 0:
+                    print(' %.5f' % c, end='    ')
+                else:
+                    print('%.5f' % c, end='    ')
         print()
 
 

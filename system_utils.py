@@ -179,6 +179,7 @@ def check_convergence(stm, a, b):
     p2x2 = derivative_equation_by_x2(stm[1])
     a = int(a)
     b = int(b)
+    print(system_func(p1x1, a, b), system_func(p1x2, a, b), system_func(p2x1, a, b), system_func(p2x2, a, b))
     for x in range(min(a, 0), max(a, 0) + 1):
         for y in range(min(b, 0), max(b, 0) + 1):
             if abs(system_func(p1x1, x, y)) + abs(system_func(p1x2, x, y)) > 1:
